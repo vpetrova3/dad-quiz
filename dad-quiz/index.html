@@ -122,10 +122,20 @@
     }
 
     function showResult() {
-      quizBox.classList.add("hidden");
+      // Hide the quiz questions and show the results
+      // Hide only the quiz container (questions), not the entire quizBox
+      quizContainer.classList.add("hidden");
       resultContainer.classList.remove("hidden");
       const score = Math.round((correctAnswers/questions.length)*100);
       let msg = score===100 ? "🎉 Браво! Ти позна всички отговори правилно! 🎉" : score>=70 ? `👏 Добър резултат! ${score}% точност.` : `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
+      resultContainer.innerHTML = `
+        ${msg}<br>
+        <img id="dad-photo" src="tati.jpg" alt="Татко">
+        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
+        <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
+      `;
+      launchConfetti();
+    }% точност.` : `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
       resultContainer.innerHTML = `
         ${msg}<br>
         <img id="dad-photo" src="tati.jpg" alt="Татко">
