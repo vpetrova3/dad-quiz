@@ -165,7 +165,7 @@
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
-        quizContainer.classList.add("hidden");
+        quizBox.classList.remove("hidden");
         resultContainer.classList.remove("hidden");
         const score = Math.round((correctAnswers / questions.length) * 100);
         let message = "";
