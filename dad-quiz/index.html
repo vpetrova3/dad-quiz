@@ -19,8 +19,6 @@
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-      opacity: 1;
-      transition: opacity 0.5s ease-in-out;
     }
     h1 {
       margin-bottom: 1rem;
@@ -67,6 +65,14 @@
       border-radius: 15px;
       margin-top: 1rem;
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+    }
+    .fade-out {
+      opacity: 0;
+      transition: opacity 0.3s ease-out;
+    }
+    .fade-in {
+      opacity: 1;
+      transition: opacity 0.3s ease-in;
     }
   </style>
 </head>
@@ -120,17 +126,16 @@
       currentQuestion++;
       
       if (currentQuestion < questions.length) {
-        quizBox.style.opacity = 0;
+        quizBox.classList.add("fade-out");
         setTimeout(() => {
           showQuestion();
-          quizBox.style.opacity = 1;
+          quizBox.classList.remove("fade-out");
         }, 300);
       } else {
-        quizBox.style.opacity = 0;
+        quizBox.classList.add("fade-out");
         setTimeout(() => {
           quizBox.classList.add("hidden");
           showResult();
-          resultContainer.style.opacity = 1;
         }, 300);
       }
     }
@@ -160,7 +165,6 @@
       correctAnswers = 0;
       resultContainer.classList.add("hidden");
       quizBox.classList.remove("hidden");
-      quizBox.style.opacity = 1;
       showQuestion();
     }
 
