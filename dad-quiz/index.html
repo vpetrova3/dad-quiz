@@ -57,18 +57,23 @@
       margin-top: 1rem;
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1000;
+    #song-link {
+      display: inline-block;
+      margin-top: 1rem;
+      padding: 10px 15px;
+      background-color: #ff6b6b;
+      color: white;
+      text-decoration: none;
+      border-radius: 5px;
+      font-weight: bold;
+    }
+    #song-link:hover {
+      background-color: #ff5252;
     }
   </style>
 </head>
 <body>
-  <canvas id="confetti-canvas"></canvas>
-
+  <canvas id="confetti-canvas" style="position:fixed;top:0;left:0;width:100%;height:100%;z-index:1000;pointer-events:none;"></canvas>
   <div class="quiz-container" id="quiz-container">
     <h1>Колко добре познаваш Татко?</h1>
     <div id="quiz"></div>
@@ -89,11 +94,11 @@
       { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
     ];
 
-    const quizContainer   = document.getElementById("quiz");
+    const quizContainer = document.getElementById("quiz");
     const resultContainer = document.getElementById("result");
-    const quizBox         = document.getElementById("quiz-container");
+    const quizBox = document.getElementById("quiz-container");
     let currentQuestion = 0;
-    let correctAnswers  = 0;
+    let correctAnswers = 0;
 
     function showQuestion() {
       const q = questions[currentQuestion];
@@ -112,6 +117,7 @@
         correctAnswers++;
       }
       currentQuestion++;
+      
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
@@ -120,61 +126,127 @@
     }
 
     function showResult() {
-      quizBox.classList.add("hidden");
+      quizContainer.classList.add("hidden");
       resultContainer.classList.remove("hidden");
-
       const score = Math.round((correctAnswers / questions.length) * 100);
       let message = "";
+      let extraContent = "";
+      
       if (score === 100) {
         message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
         launchConfetti();
+        extraContent = `
+          <a id="song-link" href="https://www.youtube.com/watch?v=7Z3Ex6tNLX4" target="_blank">
+            🎵 KISS - I Was Made For Lovin' You 🎵
+          </a>
+        `;
       } else if (score >= 70) {
         message = `👏 Добър резултат! ${score}% точност.`;
       } else {
         message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
       }
-
-      // build result HTML
+      
       resultContainer.innerHTML = `
         ${message}<br>
         <img id="dad-photo" src="tati.jpg" alt="Татко">
         <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
-        ${score === 100 
-          ? `<p><a href="https://www.youtube.com/watch?v=K0oK1JGJFRM" target="_blank">
-               🎵 Kiss – I Was Made For Lovin’ You 🎵
-             </a></p>`
-          : ``
-        }
+        ${extraContent}
         <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
       `;
     }
 
     function restartQuiz() {
       currentQuestion = 0;
-      correctAnswers  = 0;
+      correctAnswers = 0;
       resultContainer.classList.add("hidden");
-      quizBox.classList.remove("hidden");
+      quizContainer.classList.remove("hidden");
       showQuestion();
     }
 
     function launchConfetti() {
-      const script = document.createElement("script");
-      script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
-      script.onload = () => {
-        const duration = 5 * 1000;
-        const end = Date.now() + duration;
-        (function frame() {
-          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
-          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
-          if (Date.now() < end) requestAnimationFrame(frame);
-        })();
+      const canvas = document.getElementById('confetti-canvas');
+      const confettiSettings = { 
+        particleCount: 150,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#ff0000', '#00ff00', '#0000ff', '#ffff00', '#ff00ff', '#00ffff']
       };
-      document.body.appendChild(script);
+      
+      // Simple confetti implementation
+      const confetti = (function() {
+        const particles = [];
+        const context = canvas.getContext('2d');
+        
+        function init() {
+          canvas.width = window.innerWidth;
+          canvas.height = window.innerHeight;
+          window.addEventListener('resize', () => {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+          });
+          
+          for (let i = 0; i < confettiSettings.particleCount; i++) {
+            particles.push({
+              x: Math.random() * canvas.width,
+              y: Math.random() * canvas.height - canvas.height,
+              r: Math.random() * 4 + 1,
+              d: Math.random() * particles.length + 1,
+              color: confettiSettings.colors[Math.floor(Math.random() * confettiSettings.colors.length)],
+              tilt: Math.floor(Math.random() * 10) - 10,
+              tiltAngle: Math.random() * 0.1,
+              tiltAngleIncrement: Math.random() * 0.07
+            });
+          }
+          
+          animate();
+        }
+        
+        function animate() {
+          context.clearRect(0, 0, canvas.width, canvas.height);
+          
+          for (let i = 0; i < particles.length; i++) {
+            const p = particles[i];
+            context.beginPath();
+            context.lineWidth = p.r;
+            context.strokeStyle = p.color;
+            context.moveTo(p.x + p.tilt, p.y);
+            context.lineTo(p.x + p.tilt + p.r * 2, p.y);
+            context.stroke();
+            
+            p.tiltAngle += p.tiltAngleIncrement;
+            p.y += (Math.cos(p.d) + 3 + p.r / 2) / 2;
+            p.tilt = Math.sin(p.tiltAngle) * 15;
+            
+            if (p.y > canvas.height) {
+              particles[i] = {
+                x: Math.random() * canvas.width,
+                y: Math.random() * canvas.height - canvas.height,
+                r: p.r,
+                d: p.d,
+                color: p.color,
+                tilt: p.tilt,
+                tiltAngle: p.tiltAngle,
+                tiltAngleIncrement: p.tiltAngleIncrement
+              };
+            }
+          }
+          
+          requestAnimationFrame(animate);
+        }
+        
+        return { init };
+      })();
+      
+      confetti.init();
+      
+      // Stop confetti after 5 seconds
+      setTimeout(() => {
+        canvas.style.display = 'none';
+      }, 5000);
     }
 
-    // start
+    // Initialize the quiz
     showQuestion();
   </script>
 </body>
 </html>
-
