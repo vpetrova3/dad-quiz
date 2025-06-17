@@ -2,7 +2,7 @@
 <html lang="bg">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Тест за Татко</title>
   <style>
     body {
@@ -19,7 +19,6 @@
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 15px 30px rgba(0,0,0,0.1);
-      transition: opacity 0.5s ease-in-out;
     }
     h1 {
       margin-bottom: 1rem;
@@ -30,8 +29,7 @@
       font-size: 1.2rem;
       font-weight: bold;
     }
-    .answers button,
-    #retry-btn {
+    .answers button, #retry-btn {
       display: block;
       width: 100%;
       padding: 0.75rem;
@@ -43,21 +41,15 @@
       cursor: pointer;
       transition: 0.3s;
     }
-    .answers button:hover,
-    #retry-btn:hover {
+    .answers button:hover, #retry-btn:hover {
       background-color: #b2d7ff;
     }
-    .hidden { display: none; }
+    .hidden {
+      display: none;
+    }
     #result {
       font-size: 1.3rem;
       margin-top: 2rem;
-    }
-    #confetti-canvas {
-      position: fixed;
-      top: 0; left: 0;
-      width: 100%; height: 100%;
-      pointer-events: none;
-      z-index: 1000;
     }
     #dad-photo {
       max-width: 100%;
@@ -68,112 +60,86 @@
   </style>
 </head>
 <body>
-  <canvas id="confetti-canvas"></canvas>
-  <audio autoplay loop>
-    <source src="https://files.catbox.moe/sj9zrp.mp3" type="audio/mpeg">
-  </audio>
-
   <div class="quiz-container" id="quiz-container">
     <h1>Колко добре познаваш Татко?</h1>
     <div id="quiz"></div>
     <div id="result" class="hidden"></div>
   </div>
-
+  
   <script>
-    // --- QUESTIONS DATA ---
     const questions = [
-      { q: "Кое е любимото куче на татко?",        a: ["Боби","Ричи","Макс","Шаро"], correct: 1 },
-      { q: "Кой е любимият часовник на татко?",    a: ["G-Shock","Casio","Rolex Daytona със зелен циферблат","Apple Watch"], correct: 2 },
-      { q: "Коя група обича татко най-много?",     a: ["Queen","KISS","ABBA","Metallica"], correct: 1 },
-      { q: "Коя е любимата кола на татко?",       a: ["BMW","Mercedes G-Class Lorinser","Porsche Cayenne","Audi Q7"], correct: 1 },
-      { q: "Коя е мечтаната кола на татко?",      a: ["Porsche 911","Ferrari","Bugatti","Tesla"], correct: 0 },
-      { q: "Кой спорт обича татко да гледа?",      a: ["Футбол","Тенис","Баскетбол","Волейбол"], correct: 1 },
-      { q: "Каква музика слуша татко от малък?",   a: ["Поп","Рок","Класическа","Хип-хоп"], correct: 1 },
-      { q: "С каква паста впечатлява детето на татко?", a: ["Болонезе","Пълнозърнеста аглио олио","Карбонара","Фетучини Алфредо"], correct: 1 },
-      { q: "На какво място ще отидат мама и татко през февруари 2025?", a: ["Малдивите","Френска Полинезия","Тайланд","Дубай"], correct: 1 },
-      { q: "Какво се случи с грамофонните плочи, подарени на татко?", a: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
+      { question: "Кое е любимото куче на татко?", answers: ["Боби","Ричи","Макс","Шаро"], correct: 1 },
+      { question: "Кой е любимият часовник на татко?", answers: ["G-Shock","Casio","Rolex Daytona със зелен циферблат","Apple Watch"], correct: 2 },
+      { question: "Коя група обича татко най-много?", answers: ["Queen","KISS","ABBA","Metallica"], correct: 1 },
+      { question: "Коя е любимата кола на татко?", answers: ["BMW","Mercedes G-Class Lorinser","Porsche Cayenne","Audi Q7"], correct: 1 },
+      { question: "Коя е мечтаната кола на татко?", answers: ["Porsche 911","Ferrari","Bugatti","Tesla"], correct: 0 },
+      { question: "Кой спорт обича татко да гледа?", answers: ["Футбол","Тенис","Баскетбол","Волейбол"], correct: 1 },
+      { question: "Каква музика слуша татко от малък?", answers: ["Поп","Рок","Класическа","Хип-хоп"], correct: 1 },
+      { question: "С каква паста впечатлява детето на татко?", answers: ["Болонезе","Пълнозърнеста аглио олио","Карбонара","Фетучини Алфредо"], correct: 1 },
+      { question: "На какво място ще отидат мама и татко през февруари 2025?", answers: ["Малдивите","Френска Полинезия","Тайланд","Дубай"], correct: 1 },
+      { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
     ];
 
-    // --- DOM ELEMENTS & STATE ---
-    const quizEl    = document.getElementById("quiz");
-    const resultEl  = document.getElementById("result");
-    const container = document.getElementById("quiz-container");
-    let idx = 0, score = 0;
+    const quizContainer = document.getElementById("quiz");
+    const resultContainer = document.getElementById("result");
+    const quizBox = document.getElementById("quiz-container");
+    let currentQuestion = 0;
+    let correctAnswers = 0;
 
-    // --- SHOW QUESTION ---
     function showQuestion() {
-      container.style.opacity = 0;
-      setTimeout(() => {
-        const { q, a } = questions[idx];
-        quizEl.innerHTML = `
-          <div class="question">${q}</div>
-          <div class="answers">
-            ${a.map((opt,i) =>
-              `<button onclick="selectAnswer(${i})">${opt}</button>`
-            ).join('')}
-          </div>
-        `;
-        container.style.opacity = 1;
-      }, 300);
-    }
-
-    // --- HANDLE ANSWER ---
-    function selectAnswer(chosen) {
-      if (chosen === questions[idx].correct) score++;
-      idx++;
-      if (idx < questions.length) {
-        showQuestion();
-      } else {
-        showResults();
-      }
-    }
-
-    // --- SHOW RESULTS ---
-    function showResults() {
-      container.classList.add("hidden");
-      resultEl.classList.remove("hidden");
-
-      const percent = Math.round(score / questions.length * 100);
-      let msg = percent === 100
-        ? "🎉 Браво! Позна всички отговори!" 
-        : percent >= 70
-          ? `👏 Добър резултат: ${percent}% точно.` 
-          : `😅 Още работа: ${percent}% правилни.`;
-
-      if (percent === 100) launchConfetti();
-
-      resultEl.innerHTML = `
-        <p>${msg}</p>
-        <img id="dad-photo" src="tati.jpg" alt="Татко">
-        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
-        <button id="retry-btn" onclick="restart()">🔁 Опитай отново</button>
+      const q = questions[currentQuestion];
+      quizContainer.innerHTML = `
+        <div class="question">${q.question}</div>
+        <div class="answers">
+          ${q.answers.map((ans, i) =>
+            `<button onclick="submitAnswer(${i})">${ans}</button>`
+          ).join('')}
+        </div>
       `;
     }
 
-    // --- RESTART QUIZ ---
-    function restart() {
-      idx = 0; score = 0;
-      resultEl.classList.add("hidden");
-      container.classList.remove("hidden");
+    function submitAnswer(selected) {
+      if (selected === questions[currentQuestion].correct) {
+        correctAnswers++;
+      }
+      currentQuestion++;
+      
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        showResult();
+      }
+    }
+
+    function showResult() {
+      quizContainer.classList.add("hidden");
+      resultContainer.classList.remove("hidden");
+      const score = Math.round((correctAnswers / questions.length) * 100);
+      let message = "";
+      if (score === 100) {
+        message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
+      } else if (score >= 70) {
+        message = `👏 Добър резултат! ${score}% точност.`;
+      } else {
+        message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
+      }
+      resultContainer.innerHTML = `
+        ${message}<br>
+        <img id="dad-photo" src="tati.jpg" alt="Татко">
+        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
+        <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
+      `;
+    }
+
+    function restartQuiz() {
+      currentQuestion = 0;
+      correctAnswers = 0;
+      resultContainer.classList.add("hidden");
+      quizContainer.classList.remove("hidden");
       showQuestion();
     }
 
-    // --- CONFETTI ON PERFECT SCORE ---
-    function launchConfetti() {
-      const s = document.createElement("script");
-      s.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
-      s.onload = () => {
-        const duration = 5_000, end = Date.now() + duration;
-        (function frame() {
-          confetti({ particleCount: 4, angle: 60, spread: 55, origin: { x: 0 } });
-          confetti({ particleCount: 4, angle: 120, spread: 55, origin: { x: 1 } });
-          if (Date.now() < end) requestAnimationFrame(frame);
-        })();
-      };
-      document.body.appendChild(s);
-    }
-
-    // --- START ---
+    // Initialize the quiz
     showQuestion();
   </script>
 </body>
