@@ -57,9 +57,18 @@
       margin-top: 1rem;
       box-shadow: 0 10px 20px rgba(0,0,0,0.2);
     }
+    #confetti-canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+      z-index: 1000;
+    }
   </style>
 </head>
 <body>
+  <canvas id="confetti-canvas"></canvas>
+
   <div class="quiz-container" id="quiz-container">
     <h1>Колко добре познаваш Татко?</h1>
     <div id="quiz"></div>
@@ -80,11 +89,11 @@
       { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
     ];
 
-    const quizContainer = document.getElementById("quiz");
+    const quizContainer   = document.getElementById("quiz");
     const resultContainer = document.getElementById("result");
-    const quizBox = document.getElementById("quiz-container");
+    const quizBox         = document.getElementById("quiz-container");
     let currentQuestion = 0;
-    let correctAnswers = 0;
+    let correctAnswers  = 0;
 
     function showQuestion() {
       const q = questions[currentQuestion];
@@ -103,7 +112,6 @@
         correctAnswers++;
       }
       currentQuestion++;
-      
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
@@ -112,35 +120,61 @@
     }
 
     function showResult() {
-      quizContainer.classList.add("hidden");
+      quizBox.classList.add("hidden");
       resultContainer.classList.remove("hidden");
+
       const score = Math.round((correctAnswers / questions.length) * 100);
       let message = "";
       if (score === 100) {
         message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
+        launchConfetti();
       } else if (score >= 70) {
         message = `👏 Добър резултат! ${score}% точност.`;
       } else {
         message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
       }
+
+      // build result HTML
       resultContainer.innerHTML = `
         ${message}<br>
         <img id="dad-photo" src="tati.jpg" alt="Татко">
         <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
+        ${score === 100 
+          ? `<p><a href="https://www.youtube.com/watch?v=K0oK1JGJFRM" target="_blank">
+               🎵 Kiss – I Was Made For Lovin’ You 🎵
+             </a></p>`
+          : ``
+        }
         <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
       `;
     }
 
     function restartQuiz() {
       currentQuestion = 0;
-      correctAnswers = 0;
+      correctAnswers  = 0;
       resultContainer.classList.add("hidden");
-      quizContainer.classList.remove("hidden");
+      quizBox.classList.remove("hidden");
       showQuestion();
     }
 
-    // Initialize the quiz
+    function launchConfetti() {
+      const script = document.createElement("script");
+      script.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
+      script.onload = () => {
+        const duration = 5 * 1000;
+        const end = Date.now() + duration;
+        (function frame() {
+          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 } });
+          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 } });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        })();
+      };
+      document.body.appendChild(script);
+    }
+
+    // start
     showQuestion();
   </script>
 </body>
 </html>
+
