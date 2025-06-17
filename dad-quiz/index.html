@@ -19,6 +19,7 @@
       padding: 2rem;
       border-radius: 20px;
       box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+      opacity: 1;
       transition: opacity 0.5s ease-in-out;
     }
     h1 {
@@ -94,26 +95,22 @@
       { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
     ];
 
-    const quizContainer   = document.getElementById("quiz");
+    const quizContainer = document.getElementById("quiz");
     const resultContainer = document.getElementById("result");
-    const quizBox         = document.getElementById("quiz-container");
+    const quizBox = document.getElementById("quiz-container");
     let currentQuestion = 0;
-    let correctAnswers  = 0;
+    let correctAnswers = 0;
 
     function showQuestion() {
-      quizBox.style.opacity = 0;
-      setTimeout(() => {
-        const q = questions[currentQuestion];
-        quizContainer.innerHTML = `
-          <div class="question">${q.question}</div>
-          <div class="answers">
-            ${q.answers.map((ans, i) =>
-              `<button onclick="submitAnswer(${i})">${ans}</button>`
-            ).join('')}
-          </div>
-        `;
-        quizBox.style.opacity = 1;
-      }, 300);
+      const q = questions[currentQuestion];
+      quizContainer.innerHTML = `
+        <div class="question">${q.question}</div>
+        <div class="answers">
+          ${q.answers.map((ans, i) =>
+            `<button onclick="submitAnswer(${i})">${ans}</button>`
+          ).join('')}
+        </div>
+      `;
     }
 
     function submitAnswer(selected) {
@@ -122,37 +119,46 @@
       }
       currentQuestion++;
       if (currentQuestion < questions.length) {
-        showQuestion();
+        quizBox.style.opacity = 0;
+        setTimeout(() => {
+          showQuestion();
+          quizBox.style.opacity = 1;
+        }, 300);
       } else {
-        quizBox.classList.add("hidden");
-        resultContainer.classList.remove("hidden");
-        const score = Math.round((correctAnswers / questions.length) * 100);
-        let message = "";
-        if (score === 100) {
-          message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
-          launchConfetti();
-        } else if (score >= 70) {
-          message = `👏 Добър резултат! ${score}% точност.`;
-        } else {
-          message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
-        }
-        resultContainer.innerHTML = `
-          ${message}<br>
-          <img id="dad-photo" src="tati.jpg" alt="Татко">
-          <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
-          <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
-        `;
+        showResult();
       }
+    }
+
+    function showResult() {
+      quizBox.classList.add("hidden");
+      resultContainer.classList.remove("hidden");
+      const score = Math.round((correctAnswers / questions.length) * 100);
+      let message = "";
+      if (score === 100) {
+        message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
+        launchConfetti();
+      } else if (score >= 70) {
+        message = `👏 Добър резултат! ${score}% точност.`;
+      } else {
+        message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
+      }
+      resultContainer.innerHTML = `
+        ${message}<br>
+        <img id="dad-photo" src="tati.jpg" alt="Татко">
+        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
+        <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
+      `;
     }
 
     function restartQuiz() {
       currentQuestion = 0;
-      correctAnswers  = 0;
+      correctAnswers = 0;
       resultContainer.classList.add("hidden");
       quizBox.classList.remove("hidden");
       showQuestion();
     }
 
+    // Initialize the quiz
     showQuestion();
 
     function launchConfetti() {
@@ -172,5 +178,3 @@
   </script>
 </body>
 </html>
-
-
