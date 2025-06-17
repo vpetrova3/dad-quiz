@@ -79,7 +79,7 @@
     <div id="quiz"></div>
     <div id="result" class="hidden"></div>
   </div>
-
+  
   <script>
     const questions = [
   {
@@ -133,8 +133,6 @@
     correct: 2
   }
 ];
-
-
     const quizContainer = document.getElementById("quiz");
     const resultContainer = document.getElementById("result");
     const quizBox = document.getElementById("quiz-container");
@@ -165,7 +163,8 @@
       if (currentQuestion < questions.length) {
         showQuestion();
       } else {
-        quizContainer.classList.remove("hidden");
+        // Hide quiz box and show result container
+        quizBox.classList.add("hidden");
         resultContainer.classList.remove("hidden");
         const score = Math.round((correctAnswers / questions.length) * 100);
         let message = "";
@@ -192,6 +191,12 @@
       resultContainer.classList.add("hidden");
       quizBox.classList.remove("hidden");
       showQuestion();
+    }() {
+      currentQuestion = 0;
+      correctAnswers = 0;
+      resultContainer.classList.add("hidden");
+      quizContainer.classList.remove("hidden");
+      showQuestion();
     }
 
     showQuestion();
@@ -213,4 +218,3 @@
   </script>
 </body>
 </html>
-
