@@ -118,6 +118,7 @@
         correctAnswers++;
       }
       currentQuestion++;
+      
       if (currentQuestion < questions.length) {
         quizBox.style.opacity = 0;
         setTimeout(() => {
@@ -125,12 +126,16 @@
           quizBox.style.opacity = 1;
         }, 300);
       } else {
-        showResult();
+        quizBox.style.opacity = 0;
+        setTimeout(() => {
+          quizBox.classList.add("hidden");
+          showResult();
+          resultContainer.style.opacity = 1;
+        }, 300);
       }
     }
 
     function showResult() {
-      quizBox.classList.add("hidden");
       resultContainer.classList.remove("hidden");
       const score = Math.round((correctAnswers / questions.length) * 100);
       let message = "";
@@ -155,6 +160,7 @@
       correctAnswers = 0;
       resultContainer.classList.add("hidden");
       quizBox.classList.remove("hidden");
+      quizBox.style.opacity = 1;
       showQuestion();
     }
 
