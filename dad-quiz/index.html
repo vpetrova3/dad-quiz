@@ -79,26 +79,26 @@
     <div id="quiz"></div>
     <div id="result" class="hidden"></div>
   </div>
-
+  
   <script>
     const questions = [
-      { question: "Кое е любимото куче на татко?", answers: ["Боби", "Ричи", "Макс", "Шаро"], correct: 1 },
-      { question: "Кой е любимият часовник на татко?", answers: ["G-Shock", "Casio", "Rolex Daytona със зелен циферблат", "Apple Watch"], correct: 2 },
-      { question: "Коя група обича татко най-много?", answers: ["Queen", "KISS", "ABBA", "Metallica"], correct: 1 },
-      { question: "Коя е любимата кола на татко?", answers: ["BMW", "Mercedes G-Class Lorinser", "Porsche Cayenne", "Audi Q7"], correct: 1 },
-      { question: "Коя е мечтаната кола на татко?", answers: ["Porsche 911", "Ferrari", "Bugatti", "Tesla"], correct: 0 },
-      { question: "Кой спорт обича татко да гледа?", answers: ["Футбол", "Тенис", "Баскетбол", "Волейбол"], correct: 1 },
-      { question: "Каква музика слуша татко от малък?", answers: ["Поп", "Рок", "Класическа", "Хип-хоп"], correct: 1 },
-      { question: "С каква паста впечатлява детето на татко?", answers: ["Болонезе", "Пълнозърнеста аглио олио", "Карбонара", "Фетучини Алфредо"], correct: 1 },
-      { question: "На какво място ще отидат мама и татко през февруари 2025?", answers: ["Малдивите", "Френска Полинезия", "Тайланд", "Дубай"], correct: 1 },
-      { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно", "Продаде ги", "Бяха откраднати, защото разказвал за тях", "Останаха при баба"], correct: 2 }
+      { question: "Кое е любимото куче на татко?", answers: ["Боби","Ричи","Макс","Шаро"], correct: 1 },
+      { question: "Кой е любимият часовник на татко?", answers: ["G-Shock","Casio","Rolex Daytona със зелен циферблат","Apple Watch"], correct: 2 },
+      { question: "Коя група обича татко най-много?", answers: ["Queen","KISS","ABBA","Metallica"], correct: 1 },
+      { question: "Коя е любимата кола на татко?", answers: ["BMW","Mercedes G-Class Lorinser","Porsche Cayenne","Audi Q7"], correct: 1 },
+      { question: "Коя е мечтаната кола на татко?", answers: ["Porsche 911","Ferrari","Bugatti","Tesla"], correct: 0 },
+      { question: "Кой спорт обича татко да гледа?", answers: ["Футбол","Тенис","Баскетбол","Волейбол"], correct: 1 },
+      { question: "Каква музика слуша татко от малък?", answers: ["Поп","Рок","Класическа","Хип-хоп"], correct: 1 },
+      { question: "С каква паста впечатлява детето на татко?", answers: ["Болонезе","Пълнозърнеста аглио олио","Карбонара","Фетучини Алфредо"], correct: 1 },
+      { question: "На какво място ще отидат мама и татко през февруари 2025?", answers: ["Малдивите","Френска Полинезия","Тайланд","Дубай"], correct: 1 },
+      { question: "Какво се случи с грамофонните плочи, подарени на татко?", answers: ["Счупи ги случайно","Продаде ги","Бяха откраднати, защото разказвал за тях","Останаха при баба"], correct: 2 }
     ];
 
-    const quizBox = document.getElementById("quiz-container");
-    const quizContainer = document.getElementById("quiz");
+    const quizContainer   = document.getElementById("quiz");
     const resultContainer = document.getElementById("result");
+    const quizBox         = document.getElementById("quiz-container");
     let currentQuestion = 0;
-    let correctAnswers = 0;
+    let correctAnswers  = 0;
 
     function showQuestion() {
       quizBox.style.opacity = 0;
@@ -107,7 +107,9 @@
         quizContainer.innerHTML = `
           <div class="question">${q.question}</div>
           <div class="answers">
-            ${q.answers.map((a,i) => `<button onclick="submitAnswer(${i})">${a}</button>`).join('')}
+            ${q.answers.map((ans, i) =>
+              `<button onclick="submitAnswer(${i})">${ans}</button>`
+            ).join('')}
           </div>
         `;
         quizBox.style.opacity = 1;
@@ -115,50 +117,60 @@
     }
 
     function submitAnswer(selected) {
-      if (selected === questions[currentQuestion].correct) correctAnswers++;
+      if (selected === questions[currentQuestion].correct) {
+        correctAnswers++;
+      }
       currentQuestion++;
-      if (currentQuestion < questions.length) showQuestion();
-      else showResult();
-    }
-
-    function showResult() {
-      // Hide the quiz questions and show the results
-      // Hide only the quiz container (questions), not the entire quizBox
-      quizContainer.classList.add("hidden");
-      resultContainer.classList.remove("hidden");
-      const score = Math.round((correctAnswers/questions.length)*100);
-      let msg = score===100 ? "🎉 Браво! Ти позна всички отговори правилно! 🎉" : score>=70 ? `👏 Добър резултат! ${score}% точност.` : `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
-      resultContainer.innerHTML = `
-        ${msg}<br>
-        <img id="dad-photo" src="tati.jpg" alt="Татко">
-        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
-        <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
-      `;
-      launchConfetti();
-    }% точност.` : `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
-      resultContainer.innerHTML = `
-        ${msg}<br>
-        <img id="dad-photo" src="tati.jpg" alt="Татко">
-        <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
-        <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
-      `;
-      launchConfetti();
+      if (currentQuestion < questions.length) {
+        showQuestion();
+      } else {
+        quizBox.classList.add("hidden");
+        resultContainer.classList.remove("hidden");
+        const score = Math.round((correctAnswers / questions.length) * 100);
+        let message = "";
+        if (score === 100) {
+          message = "🎉 Браво! Ти позна всички отговори правилно! 🎉";
+          launchConfetti();
+        } else if (score >= 70) {
+          message = `👏 Добър резултат! ${score}% точност.`;
+        } else {
+          message = `😅 Има какво да учиш за Татко! ${score}% правилни отговори.`;
+        }
+        resultContainer.innerHTML = `
+          ${message}<br>
+          <img id="dad-photo" src="tati.jpg" alt="Татко">
+          <p><strong>„И да знаеш — Nautilus-ът идва един ден. Обещавам!“</strong></p>
+          <button id="retry-btn" onclick="restartQuiz()">🔁 Опитай отново</button>
+        `;
+      }
     }
 
     function restartQuiz() {
-      currentQuestion=0; correctAnswers=0;
+      currentQuestion = 0;
+      correctAnswers  = 0;
       resultContainer.classList.add("hidden");
       quizBox.classList.remove("hidden");
       showQuestion();
     }
 
-    function launchConfetti() {
-      const s=document.createElement('script');s.src="https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
-      s.onload=()=>{const d=5e3,e=Date.now()+d;(function f(){confetti({particleCount:5,angle:60,spread:55,origin:{x:0},zIndex:1e3});confetti({particleCount:5,angle:120,spread:55,origin:{x:1},zIndex:1e3});if(Date.now()<e)requestAnimationFrame(f);})();};document.body.appendChild(s);
-    }
-
     showQuestion();
+
+    function launchConfetti() {
+      const confettiScript = document.createElement("script");
+      confettiScript.src = "https://cdn.jsdelivr.net/npm/canvas-confetti@1.5.1/dist/confetti.browser.min.js";
+      confettiScript.onload = () => {
+        const duration = 5 * 1000;
+        const end = Date.now() + duration;
+        (function frame() {
+          confetti({ particleCount: 5, angle: 60, spread: 55, origin: { x: 0 }, zIndex: 1000 });
+          confetti({ particleCount: 5, angle: 120, spread: 55, origin: { x: 1 }, zIndex: 1000 });
+          if (Date.now() < end) requestAnimationFrame(frame);
+        })();
+      };
+      document.body.appendChild(confettiScript);
+    }
   </script>
 </body>
 </html>
+
 
